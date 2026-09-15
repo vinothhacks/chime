@@ -27,6 +27,7 @@ from chime.scheduler import (
     evaluate_snoozes,
     next_occurrence,
     occurrences_between,
+    once_occurrences_to_evaluate,
 )
 from chime.store import Store, prune_claims
 from chime.time_utils import parse_days, parse_local_time, validate_timezone
@@ -214,9 +215,10 @@ class Application:
                 for alarm in alarms:
                     if not alarm.enabled:
                         continue
-                    occs = occurrences_between(alarm, window_start, now)
                     if alarm.kind is ScheduleKind.ONCE:
-                        occs = occs[-1:] if occs else []
+                        occs = once_occurrences_to_evaluate(alarm, now, grace)
+                    else:
+                        occs = occurrences_between(alarm, window_start, now)
                     for occ in occs:
                         decision = evaluate_occurrence(occ, now, grace, claimed_keys)
                         if decision is Decision.MISSED:

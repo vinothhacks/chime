@@ -41,6 +41,20 @@ def test_ring_once_and_restart_does_not_rerun(app: Application, clock: FakeClock
     assert app.list_alarms()[0].enabled is False
 
 
+def test_once_alarm_stays_armed_until_its_time(app: Application, clock: FakeClock) -> None:
+    """A 21:35 one-shot must not be killed by yesterday's 21:35 while waiting."""
+    clock.set(datetime(2026, 9, 15, 20, 0, tzinfo=ZoneInfo("Asia/Kolkata")))
+    app.create_alarm("21:35", once=True, timezone="Asia/Kolkata", label="GYM")
+    waiting = app.process_clock_tick()
+    assert waiting.ring is None
+    assert waiting.missed_keys == ()
+    assert app.list_alarms()[0].enabled is True
+    clock.set(datetime(2026, 9, 15, 21, 35, 6, tzinfo=ZoneInfo("Asia/Kolkata")))
+    due = app.process_clock_tick()
+    assert due.ring is not None
+    assert due.ring.alarm_id == app.list_alarms()[0].id
+
+
 def test_grace_two_minutes_late_rings(app: Application, clock: FakeClock) -> None:
     app.create_alarm("07:30", once=True, timezone="Asia/Kolkata")
     clock.set(datetime(2026, 9, 15, 7, 32, tzinfo=ZoneInfo("Asia/Kolkata")))

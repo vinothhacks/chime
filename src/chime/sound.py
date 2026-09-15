@@ -124,7 +124,10 @@ class DefaultAudioPlayer:
             try:
                 import winsound
 
-                winsound.PlaySound(wav, winsound.SND_FILENAME | winsound.SND_ASYNC)
+                winsound.PlaySound(
+                    wav,
+                    winsound.SND_FILENAME | winsound.SND_ASYNC | winsound.SND_LOOP,
+                )
             except Exception:
                 sys.stdout.write("\a")
                 sys.stdout.flush()

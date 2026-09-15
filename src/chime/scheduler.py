@@ -26,6 +26,33 @@ def next_occurrence(alarm: Alarm, now: datetime) -> Occurrence | None:
     return None
 
 
+def once_occurrences_to_evaluate(
+    alarm: Alarm,
+    now: datetime,
+    grace: timedelta,
+) -> list[Occurrence]:
+    """One-shot alarms have a single fire, not a fake history of every past day.
+
+    Only today's past-or-equal occurrence is eligible for RING/MISSED.
+    Yesterday is included only when still inside the grace window (midnight wrap).
+    """
+    now_utc = ensure_aware_utc(now)
+    tz = ZoneInfo(alarm.timezone)
+    local_date = now_utc.astimezone(tz).date()
+    found: list[Occurrence] = []
+    today = occurrence_on_date(alarm, local_date)
+    if today is not None and today.scheduled_utc <= now_utc:
+        found.append(today)
+    yesterday = occurrence_on_date(alarm, local_date - timedelta(days=1))
+    if (
+        yesterday is not None
+        and yesterday.scheduled_utc <= now_utc
+        and now_utc - yesterday.scheduled_utc <= grace
+    ):
+        found.append(yesterday)
+    return found
+
+
 def occurrences_between(alarm: Alarm, start: datetime, end: datetime) -> list[Occurrence]:
     """Valid occurrences with scheduled_utc in [start, end]."""
     start_utc = ensure_aware_utc(start)
