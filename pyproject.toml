@@ -1,0 +1,77 @@
+[project]
+name = "chime-alarm"
+version = "0.1.0"
+description = "Terminal-native alarm clock (CLI + TUI). No web UI, no database."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+authors = [{ name = "Vinoth N" }]
+keywords = ["alarm", "cli", "tui", "terminal"]
+classifiers = [
+  "Environment :: Console",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Utilities",
+]
+dependencies = [
+  "textual~=8.2.8",
+  "typer~=0.27.2",
+  "platformdirs>=4.3",
+  "tzdata>=2025.1",
+]
+
+[project.scripts]
+chime = "chime.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/vinothhacks/chime"
+Repository = "https://github.com/vinothhacks/chime"
+
+[build-system]
+requires = ["uv_build>=0.11.26,<0.12.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "chime"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3",
+  "pytest-asyncio>=0.25",
+  "ruff>=0.11",
+  "mypy>=1.15",
+  "textual-dev>=1.7",
+  "build>=1.2",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+mypy_path = "src"
+packages = ["chime"]
+exclude = ["tests/"]
+warn_unused_ignores = false
+
+[[tool.mypy.overrides]]
+module = ["winsound"]
+ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/chime/cli.py" = ["B008"]
+
+[tool.ruff.format]
+quote-style = "double"
