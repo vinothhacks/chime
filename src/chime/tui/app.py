@@ -27,7 +27,7 @@ from chime.tui.widgets.next_alarm import NextAlarm
 class ChimeApp(App[None]):
     CSS_PATH = "styles.tcss"
     TITLE = "CHIME"
-    SUB_TITLE = "Tokyo Night"
+    SUB_TITLE = "India · IST"
     BINDINGS = [
         Binding("a", "add_alarm", "Add", show=True),
         Binding("e", "edit_alarm", "Edit", show=True),
@@ -122,14 +122,13 @@ class ChimeApp(App[None]):
         self.query_one(NextAlarm).show(nxt, state.alarms, now)
 
     def _refresh_clock(self) -> None:
+        from chime.config import INDIA_TZ
+
         state = self.application.load_state()
-        tz = state.settings.default_timezone or "UTC"
-        try:
-            local = self.application.clock.now_local(tz)
-        except Exception:
-            local = self.application.clock.now_utc()
+        local = self.application.clock.now_local(INDIA_TZ)
+        self.sub_title = "India · IST"
         self.query_one(BigClock).update_now(local, state.settings.format_24h)
-        self.query_one("#date-line", Static).update(local.strftime("%a %d %b %Y"))
+        self.query_one("#date-line", Static).update(local.strftime("%a %d %b %Y") + " · IST")
 
     def _open_ring(self, ring: object, alarm: Alarm) -> None:
         from chime.models import ActiveRing
@@ -189,7 +188,7 @@ class ChimeApp(App[None]):
             snooze = int(data["snooze"])
             max_snoozes = int(data["max_snoozes"])
             once = data["once"] == "1"
-            tz = data["timezone"].strip() or None
+            tz = data.get("timezone", "").strip() or None
             if existing is None:
                 self.application.create_alarm(
                     data["time"],

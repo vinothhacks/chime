@@ -84,7 +84,7 @@ class Settings:
     format_24h: bool = True
     theme: str = "tokyo-night"
     grace_minutes: int = 5
-    default_timezone: str = "UTC"
+    default_timezone: str = "Asia/Kolkata"
 
 
 @dataclass(frozen=True, slots=True)

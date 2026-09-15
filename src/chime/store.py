@@ -289,7 +289,7 @@ def parse_settings(raw: Any) -> Settings:
     grace = raw.get("grace_minutes", 5)
     if not isinstance(grace, int) or grace < 0 or grace > 180:
         raise CorruptStateError("grace_minutes out of range")
-    tz = raw.get("default_timezone", "UTC")
+    tz = raw.get("default_timezone", "Asia/Kolkata")
     if not isinstance(tz, str):
         raise CorruptStateError("default_timezone must be a string")
     try:

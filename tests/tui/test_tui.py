@@ -38,3 +38,15 @@ async def test_tui_toggle(data_dir: Path, clock: FakeClock) -> None:
         await pilot.press("space")
         await pilot.pause()
     assert application.list_alarms()[0].enabled is False
+
+
+@pytest.mark.asyncio
+async def test_tui_shows_indian_time_not_tokyo(data_dir: Path, clock: FakeClock) -> None:
+    store = Store(data_dir, ProcessLock(data_dir / "chime.lock"))
+    application = Application(store, clock)
+    app = ChimeApp(application, audio=NullAudioPlayer(), auto_dismiss_on_exit=False)
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        subtitle = app.sub_title or ""
+        assert "Tokyo" not in subtitle
+        assert "IST" in subtitle

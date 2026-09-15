@@ -19,7 +19,6 @@ class EditAlarmScreen(ModalScreen[dict[str, str] | None]):
         alarm = self.alarm
         time_value = alarm.local_time if alarm else ""
         label_value = alarm.label if alarm else ""
-        tz_value = alarm.timezone if alarm else ""
         snooze_value = str(alarm.snooze_minutes if alarm else 9)
         max_value = str(alarm.max_snoozes if alarm else 3)
         once = True if alarm is None else alarm.kind is ScheduleKind.ONCE
@@ -38,8 +37,6 @@ class EditAlarmScreen(ModalScreen[dict[str, str] | None]):
             )
             yield Label("Days (weekdays / sat,sun) — ignored for one-shot")
             yield Input(days_value, placeholder="weekdays", id="days")
-            yield Label("Timezone")
-            yield Input(tz_value, placeholder="Asia/Kolkata", id="timezone")
             yield Label("Snooze minutes")
             yield Input(snooze_value, id="snooze")
             yield Label("Max snoozes")
@@ -70,7 +67,7 @@ class EditAlarmScreen(ModalScreen[dict[str, str] | None]):
             "label": self.query_one("#label", Input).value,
             "once": "1" if self.query_one("#once", Switch).value else "0",
             "days": self.query_one("#days", Input).value,
-            "timezone": self.query_one("#timezone", Input).value,
+            "timezone": "Asia/Kolkata",
             "snooze": self.query_one("#snooze", Input).value,
             "max_snoozes": self.query_one("#max_snoozes", Input).value,
         }
